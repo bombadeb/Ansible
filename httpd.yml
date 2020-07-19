@@ -1,0 +1,10 @@
+---
+- name: Start HTTPD
+  hosts: web1
+  gather_facts: no
+  tasks:
+    - name: Start HTTPDD service
+      service:
+        name: httpd
+        state: started
+        enabled: yes
