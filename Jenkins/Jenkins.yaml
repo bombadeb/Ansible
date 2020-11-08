@@ -1,0 +1,40 @@
+---
+
+-
+ hosts: LINUX
+ gather_facts: no
+
+ tasks:
+  - name: Install wget and openjdk
+    become: yes
+    apt:
+      name: "{{ item }}"
+      state: present
+    with_items:
+      - wget
+      - openjdk-8-jdk
+
+  - name: Add Jenkins apt repository
+    apt_key: url=https://pkg.jenkins.io/debian-stable/jenkins.io.key state=present
+    become: yes
+
+  - name: Configure repository
+    apt_repository: repo='deb https://pkg.jenkins.io/debian-stable binary/' state=present
+    become: yes
+
+  - name: Jenkins Install
+    apt: name=jenkins update_cache=yes
+    become: yes
+
+  - name: Jenkins start service
+    service: name=jenkins state=started
+
+  - name: Initial Password for Jenkins login
+    shell: cat /var/lib/jenkins/secrets/initialAdminPassword
+    changed_when: false
+    become: yes
+    register: output
+
+  - name: Print password for Jenkins
+    debug:
+      var: output.stdout
